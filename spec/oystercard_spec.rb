@@ -3,6 +3,8 @@ require 'oystercard'
 describe Oystercard do
   let(:station) { double :station }
   let(:exit_station) { double :exit_station }
+  let(:partial_journey) { double :partial_journey }
+  # let(:complete_journey) { double(:complete_journey, calculate_fare: 1)}
   let(:journey) { {entry_station: station, exit_station: exit_station} }
 
   it 'New card instance has a balance of 0' do
@@ -42,23 +44,17 @@ describe Oystercard do
       expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-1)
     end
 
-    # How can we test this?????!!!!!!!!!!!!!!!
-
-    # it 'stores entry_station to an array as a hash' do
-    #   new_journey = double(:new_journey)
-    #   allow(subject).to receive(:touch_in).and_return(subject.journey_list << new_journey)
+    # it 'when we touch out, we add exit station to the current journey' do
     #   subject.touch_in(station)
-    #   p subject.touch_in(station)
-    #   expect(subject.journey_list).to eq [new_journey]
-    #   p subject.journey_list
+    #   subject.touch_out(exit_station)
+    #   expect(subject.journey_list).to eq [journey]
     # end
 
-    it 'when we touch out, we add exit station to the current journey' do
-      subject.touch_in(station)
-      subject.touch_out(exit_station)
-      expect(subject.journey_list).to eq [journey]
+    it 'touch in stores new journey instance into journey list' do
+      allow(Journey).to receive(:new).and_return(partial_journey)
+      new_journey_list = subject.touch_in('station')
+      expect(new_journey_list).to eq([partial_journey])
     end
-
   end 
 
 end
