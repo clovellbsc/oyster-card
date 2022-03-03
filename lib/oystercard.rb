@@ -4,8 +4,6 @@ class Oystercard
   attr_accessor :balance, :journey_list
 
   MAX_BALANCE = 90
-  MIN_JOURNEY_BALANCE = 1
-  MIN_JOURNEY_FEE = 1
 
   def initialize(balance =0)
     @balance = balance
@@ -38,7 +36,7 @@ class Oystercard
   end
 
   def reject_card_if_insufficient_funds_for_journey
-    raise "Insufficient balance for journey" if @balance < MIN_JOURNEY_BALANCE
+    raise "Insufficient balance for journey" if @balance < Journey::FARE
   end
 
   def deduct(amount)
