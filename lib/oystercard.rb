@@ -8,7 +8,7 @@ class Oystercard
   MIN_JOURNEY_FEE = 1
 
   def initialize(balance =0)
-    @balance = balance #oystercard class
+    @balance = balance
     @journey_list = []
     @journey = nil
   end
@@ -18,17 +18,15 @@ class Oystercard
     @balance += amount
   end
 
-  # def in_journey? #journey class
-  #   @journey_list.empty? ? false : !@journey_list.last.has_key?(:exit_station)
-  # end
-
-  def touch_in(station)#receive station from journey class
+  def touch_in(station)
     reject_card_if_insufficient_funds_for_journey
+    deduct(@journey.calculate_fare) if @journey != nil && @journey.in_journey?
     @journey = Journey.new(station)
     @journey_list << @journey
   end
 
-  def touch_out(station)#receive station from journey class
+  def touch_out(station)
+    return deduct(Journey::PENALTY_FARE) if @journey == nil || @journey.is_journey_complete?
     @journey.exit_station(station)
     deduct(@journey.calculate_fare)
   end

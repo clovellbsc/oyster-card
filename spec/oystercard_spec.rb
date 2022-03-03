@@ -12,8 +12,7 @@ describe Oystercard do
   end
 
   it 'Oystercard to be topped up by £5' do
-    subject.top_up_card(5)
-    expect(subject.balance).to eq 5
+    expect{ subject.top_up_card(5) }.to change { subject.balance }.by(5)
   end
   
   it 'raises an error when top-up takes balance over £90' do
@@ -33,28 +32,31 @@ describe Oystercard do
 
   context 'oystercard balance has sufficient journey funds' do
     before(:each) do
-      subject.balance = 5
+      subject.balance = 10
     end
-
- 
-    it 'oystercard touching out reduces the balance of the oystercard by journey fare' do
-      new_journey = double(:new_journey)
-      allow(new_journey).to receive(:calculate_fare).and_return(1)
-      subject.touch_in(station)
-      expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-1)
-    end
-
-    # it 'when we touch out, we add exit station to the current journey' do
-    #   subject.touch_in(station)
-    #   subject.touch_out(exit_station)
-    #   expect(subject.journey_list).to eq [journey]
-    # end
 
     it 'touch in stores new journey instance into journey list' do
       allow(Journey).to receive(:new).and_return(partial_journey)
       new_journey_list = subject.touch_in('station')
       expect(new_journey_list).to eq([partial_journey])
     end
+ 
+    it 'oystercard touching out to complete journey reduces the balance of the oystercard by journey fare' do
+      new_journey = double(:new_journey)
+      allow(new_journey).to receive(:calculate_fare).and_return(1)
+      subject.touch_in(station)
+      expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-1)
+    end
+
+    it "deducts penalty fare if touch in when previous journey is incomplete (no touch out)" do
+      subject.touch_in(station)
+      expect{ subject.touch_in(station) }.to change{ subject.balance }.by(-6)
+    end 
+
+    it "deducts penalty fare when no touch in but touch out" do
+      expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by(-6)
+    end
+
   end 
 
 end
