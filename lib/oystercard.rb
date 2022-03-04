@@ -1,4 +1,4 @@
-require_relative 'journey'
+require_relative 'journey_log'
 
 class Oystercard
   attr_accessor :balance, :journey_list
@@ -7,8 +7,8 @@ class Oystercard
 
   def initialize(balance =0)
     @balance = balance
-    @journey_list = []
-    @journey = nil
+
+    #@jouney_log = JourneyLog.new
   end
 
   def top_up_card(amount)
@@ -18,15 +18,12 @@ class Oystercard
 
   def touch_in(station)
     reject_card_if_insufficient_funds_for_journey
-    deduct(@journey.calculate_fare) if @journey != nil && @journey.in_journey?
-    @journey = Journey.new(station)
-    @journey_list << @journey
+    deduct(@journey.calculate_fare) if @journey != nil && @journey.in_journey? #journeyLog and oystercard
   end
 
   def touch_out(station)
-    return deduct(Journey::PENALTY_FARE) if @journey == nil || @journey.is_journey_complete?
-    @journey.exit_station(station)
-    deduct(@journey.calculate_fare)
+    return deduct(Journey::PENALTY_FARE) if @journey == nil || @journey.is_journey_complete? #JourneyLog and oystercard
+    deduct(@journey.calculate_fare) #oystercard and JourneyLog
   end
 
   private
