@@ -4,13 +4,17 @@ class Journey
   FARE = 1
   PENALTY_FARE = 6
 
-  def initialize(entry_station)
-    @entry_station = entry_station
+  def initialize#(entry_station)
+    @entry_station = nil #entry_station
     @exit_station = nil
   end
 
+  def entry_station(station)
+    @entry_station = station
+  end
+
   def in_journey?
-    @exit_station.nil?
+    @exit_station.nil? && !@entry_station.nil?
   end
 
   def exit_station(exit_station)
